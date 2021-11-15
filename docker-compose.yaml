@@ -1,0 +1,35 @@
+version: "3.4"
+
+volumes:
+  postgresql-data:
+  artifact-store:
+
+services:
+  db:
+    container_name: mlflow-backend-store
+    image: postgres:13.3
+    env_file:
+      - .envs/.postgres
+    volumes:
+      - postgresql-data:/var/lib/postgresql/data
+
+  app: &app
+    user: "${UID:-1000}"
+    container_name: mlflow-tracking-server
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+      args:
+        USER_ID: "${UID:-1000}"
+        DEV_MODE: "1"
+        ARTIFACT_STORE: "${ARTIFACT_STORE:-/artifact-store}"
+    ports:
+      - 5000:5000
+    depends_on:
+      - db
+    env_file:
+      - .envs/.postgres
+      - .envs/.tracking-server
+    volumes:
+      - ./:/app
+      - artifact-store:${ARTIFACT_STORE:-/artifact-store}
