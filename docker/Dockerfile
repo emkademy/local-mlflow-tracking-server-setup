@@ -14,6 +14,11 @@ ENV \
     LANG=C.UTF-8 \
     BUILD_POETRY_LOCK="${HOME}/poetry.lock.build"
 
+RUN apt-get -qq update \
+    && DEBIAN_FRONTEND="noninteractive" apt-get -qq -y install git \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get -qq -y clean
+
 RUN addgroup --system --gid "${USER_ID}" "${USER_NAME}" \
     && adduser --system --home "${HOME}" --uid "${USER_ID}" --ingroup "${USER_NAME}" "${USER_NAME}"
 

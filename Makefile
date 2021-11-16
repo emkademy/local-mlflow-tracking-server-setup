@@ -2,7 +2,7 @@
 
 DOCKER_COMPOSE_RUN = docker-compose run --rm app
 DOCKER_COMPOSE_EXEC = docker-compose exec app
-lock_dependencies: BUILD_POETRY_LOCK = /home/emkademy/poetry.lock.build 
+lock-dependencies: BUILD_POETRY_LOCK = /home/emkademy/poetry.lock.build 
 
 
 ## Build docker containers with docker-compose
@@ -22,8 +22,8 @@ exec-in: up
 	docker exec -it mlflow-tracking-server bash
 
 ## Lock dependencies with pipenv
-lock_dependencies:
-	$(DOCKER_COMPOSE_RUN) bash -c "if [ -e ${BUILD_PIPFILE_LOCK} ]; then cp ${BUILD_PIPFILE_LOCK} Pipenv.lock; else pipenv lock; fi"
+lock-dependencies:
+	$(DOCKER_COMPOSE_RUN) bash -c "if [ -e $(BUILD_POETRY_LOCK) ]; then cp $(BUILD_POETRY_LOCK) ./poetry.lock; else poetry lock; fi"
 
 ## Delete all compiled Python files
 clean:

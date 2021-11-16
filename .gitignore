@@ -130,3 +130,5 @@ dmypy.json
 
 .envs/.postgres
 .envs/.tracking-server
+
+mlruns/
