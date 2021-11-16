@@ -83,12 +83,14 @@ def draw_confusion_matrix(true_labels: np.ndarray, predicted_labels: np.ndarray,
 
 
 def main(args):
-    df = pd.read_csv("imdb-dataset.csv")
+    df = pd.read_csv("../imdb-dataset.csv")
     df["label"] = pd.factorize(df["sentiment"])[0]
 
     test_size = 0.3
     train_df, test_df = prepare_data(df, test_size=test_size)
 
+    mlflow.set_tracking_uri("http://mlflow-tracking-server:5000")
+    mlflow.set_experiment("mlflow-models")
     with mlflow.start_run():
         train_inputs, test_inputs = make_features(train_df, test_df)
         model = train(

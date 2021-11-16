@@ -85,13 +85,14 @@ def draw_confusion_matrix(true_labels: np.ndarray, predicted_labels: np.ndarray,
 
 
 def main(args):
-    df = pd.read_csv("imdb-dataset.csv")
+    df = pd.read_csv("../imdb-dataset.csv")
     df["label"] = pd.factorize(df["sentiment"])[0]
 
     test_size = 0.3
     train_df, test_df = prepare_data(df, test_size=test_size)
 
-    mlflow.set_tracking_uri("http://0.0.0.0:5000")
+    mlflow.set_tracking_uri("http://mlflow-tracking-server:5000")
+    mlflow.set_experiment("mlflow-models")
     with mlflow.start_run():
         train_inputs, test_inputs = make_features(train_df, test_df)
         model = train(
@@ -101,6 +102,7 @@ def main(args):
             C=args.C,
             solver=args.solver
         )
+        dump(model, "model.joblib")
 
         f1_score, figure = evaluate(model, test_inputs, test_df["label"].values, df["sentiment"].unique().tolist())
         print("F1 score: ", f1_score)
@@ -110,10 +112,17 @@ def main(args):
         mlflow.log_figure(figure, "figure.png")
 
         signature = infer_signature(test_inputs.toarray(), model.predict(test_inputs))
-        sentiment_detector = SentimentDetector(load("vectorizer.joblib"), model)
-        print("BEFORE SAVING MODEL!")
-        mlflow.pyfunc.save_model(path="sentiment_detector", python_model=sentiment_detector)
-        print("AFTER SAVING MODEL!")
+        sentiment_detector = SentimentDetector()
+        artifacts = {
+            "vectorizer": "./vectorizer.joblib",
+            "model": "model.joblib"
+        }
+        mlflow.pyfunc.log_model(
+            artifact_path="model", 
+            conda_env="./conda.yaml",
+            python_model=sentiment_detector, 
+            artifacts=artifacts
+        )
 
 
 if __name__ == "__main__":
