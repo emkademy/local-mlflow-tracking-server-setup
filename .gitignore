@@ -128,8 +128,5 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-.envs/.postgres
-.envs/.tracking-server
-
 mlruns/
 *.joblib

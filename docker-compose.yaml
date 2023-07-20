@@ -1,11 +1,30 @@
-version: "3.4"
+version: "3.8"
+
+# Hello, and welcome back. In this lecture, we are going to see how we can set up MLFlow locally on our computers. 
+# Sometimes you might need to perform some test runs, for debugging or adding new features for example, 
+# in these cases we wouldn’t want to write these dummy experiments onto our production MLFlow server. 
+# For these cases, we are going to have a local MLFlow installation, and we are going to log these experiments there. 
+# But don’t worry, it will be seamless to switch between the local MLFlow installation and the remote one. Alright, let’s get started.
+
+# First of all, what do we need to run an MLFlow tracking server?
+# We need:
+#   1. A backend store to store the parameter values, metric values and so on,
+#   2. And an artifact store to store our artifacts
+#
+# For the backend store we are going to use a Postgres database, and for the artifact store we are going to use our local storage
+
+# Let's start by defining some volues. We are going to define a volume for Postgres database data and also for our artifact store
 
 volumes:
   postgresql-data:
   artifact-store:
 
+# Next, let's define our services. We are going to have 2 services: 1 for the postgres database, and the other for the tracking server
+
 services:
-  db:
+
+# First of all, let's define our backend store, which is a postgres database
+  mlflow-db:
     container_name: mlflow-backend-store
     image: postgres:13.3
     env_file:
@@ -13,23 +32,33 @@ services:
     volumes:
       - postgresql-data:/var/lib/postgresql/data
 
-  app: &app
-    user: "${UID:-1000}"
-    container_name: mlflow-tracking-server
+    # Let's now create the env file we defined here
+
+  # Alright, now let's define our tracking server service
+  mlflow-server:
+    image: local-mlflow-tracking-server
+    container_name: local-mlflow-tracking-server
     build:
       context: .
       dockerfile: ./docker/Dockerfile
+      # We are going to pass the Artifact store's location as an argument to our Dockerfile
       args:
-        USER_ID: "${UID:-1000}"
-        DEV_MODE: "1"
-        ARTIFACT_STORE: "${ARTIFACT_STORE:-/artifact-store}"
+        MLFLOW_ARTIFACT_STORE: ${MLFLOW_ARTIFACT_STORE}
     ports:
-      - 5000:5000
+      - ${LOCAL_DEV_MLFLOW_SERVER_PORT}:${LOCAL_DEV_MLFLOW_SERVER_PORT}
     depends_on:
-      - db
+      # Of course the tracking server depends on the backend store
+      - mlflow-db
     env_file:
       - .envs/.postgres
-      - .envs/.tracking-server
+      - .envs/.mlflow-common
+      - .envs/.mlflow-dev
     volumes:
       - ./:/app
-      - artifact-store:${ARTIFACT_STORE:-/artifact-store}
+      # This line we don't need actually, but it is good to have it here for debugging and so on
+      - artifact-store:${MLFLOW_ARTIFACT_STORE}
+    ipc: host
+    init: true
+
+    # Alright let's create the env files we specified here now. First of all, let's create .mlflow-common
+

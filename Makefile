@@ -1,8 +1,13 @@
 .PHONY: clean
 
-DOCKER_COMPOSE_RUN = docker-compose run --rm app
-DOCKER_COMPOSE_EXEC = docker-compose exec app
-lock-dependencies: BUILD_POETRY_LOCK = /home/emkademy/poetry.lock.build 
+include .envs/.mlflow-common
+include .envs/.mlflow-dev
+include .envs/.postgres
+export
+
+DOCKER_COMPOSE_RUN = docker-compose run --rm mlflow-server
+DOCKER_COMPOSE_EXEC = docker-compose exec mlflow-server
+lock-dependencies: BUILD_POETRY_LOCK = /poetry.lock.build 
 
 
 ## Build docker containers with docker-compose
@@ -19,7 +24,7 @@ down:
 
 ## docker exec -it mlflow-tracking-server bash
 exec-in: up
-	docker exec -it mlflow-tracking-server bash
+	docker exec -it local-mlflow-tracking-server bash
 
 ## Lock dependencies with pipenv
 lock-dependencies:

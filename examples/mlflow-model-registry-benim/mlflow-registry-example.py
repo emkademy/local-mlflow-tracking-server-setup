@@ -122,7 +122,7 @@ def main(args):
             conda_env="./conda.yaml",
             python_model=sentiment_detector, 
             artifacts=artifacts,
-            registered_model_name="basic-sentiment-classifier"
+            registered_model_name="demo-model"
         )
 
 
