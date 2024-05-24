@@ -1,11 +1,4 @@
-# Here we are going to define some environment variables that are going to be needed
-# both for the local and remote MLFlow tracking server. It will make more sense why we need
-# such a file when we actually deploy MLFlow on GCP. For now, let's define some variables
-
 LOCAL_DEV_MLFLOW_SERVER_HOST=127.0.0.1
 LOCAL_DEV_MLFLOW_SERVER_PORT=6101
 
 PROD_MLFLOW_SERVER_PORT=6100
-
-
-# Next, let's create .mlflow-dev env file

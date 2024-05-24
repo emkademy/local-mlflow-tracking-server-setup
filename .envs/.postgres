@@ -1,5 +1,3 @@
-# For postgres we need 3 environment variables:
-
 POSTGRES_DB=backend-store
 POSTGRES_USER=backend-store
 POSTGRES_PASSWORD=backend-store

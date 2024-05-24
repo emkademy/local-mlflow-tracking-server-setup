@@ -1,10 +1,5 @@
-# There variables we are going to define in this file will only be used in our local MLFlow installation
-# Alright, what do we need?
-
 MLFLOW_BACKEND_STORE=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@mlflow-backend-store/${POSTGRES_DB}
 MLFLOW_ARTIFACT_STORE=/mlflow-artifact-store
 
 MLFLOW_INTERNAL_TRACKING_URI=http://${LOCAL_DEV_MLFLOW_SERVER_HOST}:${LOCAL_DEV_MLFLOW_SERVER_PORT}
 MLFLOW_TRACKING_URI=${MLFLOW_INTERNAL_TRACKING_URI}
-
-# Let's now create our Dockerfile

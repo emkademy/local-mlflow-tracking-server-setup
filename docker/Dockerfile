@@ -32,5 +32,3 @@ RUN python3.10 -m venv "${VIRTUAL_ENV}" \
     && rm -rf "${HOME}/.cache/*"
 
 CMD ["/run-server.sh"]
-
-# Let's now create the run-server.sh file
